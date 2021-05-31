@@ -1,11 +1,9 @@
 import React, { useState, useReducer } from 'react';
 import Reducer, { hitory, transac } from './Reducer';
-//import firebase from './firebase';
 
 
 
-
-const history: hitory= {
+const history: hitory = {
     transaction: []
 }
 
@@ -14,47 +12,62 @@ export default function Child() {
     const [detail, setDetail] = useState<string>('');
     const [amount, setAmount] = useState<number>();
     const [state, dispatch] = useReducer(Reducer, history);
-    const [income, setIncome] = useState(0);
-    const [expense, setExpense] = useState(0);
     const handleClick = (e: React.FormEvent<EventTarget>) => {
         e.preventDefault();
-       
+
         if (amount && detail) {
             const transaction: transac = { detail: detail, Amount: amount, id: Math.random() };
             dispatch({ type: 'ADD', payload: transaction });
+            console.log(state.transaction.length);
         }
     }
     const handleRemove = (id: number) => {
         dispatch({ type: "REMOVE", payload: id })
     }
-    function getIncome(): (number | undefined) {
-        let income = 0;
+    function getIncome(): number {
+        let Income = 0;
         for (var i = 0; i < state.transaction.length; i++) {
-            if (Number(state.transaction[i].Amount) >= 0) {
-                income += Number(state.transaction[i].Amount);
+            if (Number(state.transaction[i].Amount) > 0) {
+                Income += Number(state.transaction[i].Amount);
             }
-            return income
         }
-    } function getExpense(): (number | undefined) {
+        return Income;
+    }
+    function getExpense(): number {
         let expense = 0;
         for (var i = 0; i < state.transaction.length; i++) {
             if (Number(state.transaction[i].Amount) < 0) {
                 expense += Number(state.transaction[i].Amount);
             }
-            return expense
         }
+        return expense;
     }
-   
+    function getBalance() {
+        const balance: number = getIncome() + getExpense();
+        if (balance >= 0) {
+            return (
+                <h2 style={{ color: 'green' }}>{balance}</h2>
+            )
+        }
+        else {
+            return (
+                <h2 style={{ color: 'red' }}>{balance}</h2>
+            )
+        }
+
+    }
+
     return (
         <div id='expense'>
             <h1>Expense App</h1>
             <div className='parts'>
                 <div id='heading'>
                     <h2>Balance:</h2>
+                    {getBalance()}
                 </div>
                 <div id='part1'>
-                    <h3>Income: <i>{getIncome()}</i> </h3>
-                    <h3>Expense: <i>{getExpense()}</i></h3>
+                    <h3>Income: <i style={{ color: "green" }}>{getIncome()}</i> </h3>
+                    <h3>Expense: <i style={{ color: "red" }}>{getExpense()}</i></h3>
                 </div>
                 <div id='part2'>
                     <h2>History:</h2>
